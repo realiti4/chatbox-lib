@@ -14,6 +14,7 @@ export default defineConfig({
       fileName: (format) => `chat-widget.${format}.js`
     },
     rollupOptions: {
+      // external: ['react', 'react-dom'],
       output: {
         globals: {
           react: 'React',

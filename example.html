@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Professional services and solutions for your business needs">
-  <title>Business Solutions | Chat Support Available</title>
+  <meta name="description" content="Discover and download the best PC games with GameVault - your ultimate gaming platform">
+  <title>GameVault | Your Digital Game Library</title>
   
   <!-- Favicon -->
   <link rel="icon" href="favicon.ico" type="image/x-icon">
@@ -21,11 +21,11 @@
   <!-- Inline styles for demo purposes -->
   <style>
     :root {
-      --primary-color: #2563eb;
-      --secondary-color: #0f172a;
-      --accent-color: #f59e0b;
-      --light-color: #f8fafc;
-      --dark-color: #1e293b;
+      --primary-color: #66c0f4;
+      --secondary-color: #1b2838;
+      --accent-color: #c7d5e0;
+      --light-color: #c7d5e0;
+      --dark-color: #0f1922;
     }
     
     * {
@@ -37,8 +37,8 @@
     body {
       font-family: 'Open Sans', sans-serif;
       line-height: 1.6;
-      color: var(--dark-color);
-      background-color: var(--light-color);
+      color: var(--light-color);
+      background-color: var(--secondary-color);
     }
     
     .container {
@@ -49,10 +49,10 @@
     }
     
     header {
-      background-color: var(--secondary-color);
+      background-color: var(--dark-color);
       color: white;
       padding: 1rem 0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
     
     .header-content {
@@ -68,7 +68,7 @@
     }
     
     .logo span {
-      color: var(--accent-color);
+      color: var(--primary-color);
     }
     
     nav ul {
@@ -88,32 +88,38 @@
     }
     
     nav ul li a:hover {
-      color: var(--accent-color);
+      color: var(--primary-color);
     }
     
     .hero {
-      background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+      background: linear-gradient(135deg, var(--dark-color), var(--secondary-color));
       color: white;
       padding: 4rem 0;
       text-align: center;
+      background-image: url('https://source.unsplash.com/random/1600x800/?gaming');
+      background-size: cover;
+      background-position: center;
+      background-blend-mode: overlay;
     }
     
     .hero h1 {
       font-family: 'Poppins', sans-serif;
       font-size: 3rem;
       margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
     }
     
     .hero p {
       font-size: 1.2rem;
       max-width: 600px;
       margin: 0 auto 2rem;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
     }
     
     .btn {
       display: inline-block;
-      background-color: var(--accent-color);
-      color: white;
+      background-color: var(--primary-color);
+      color: var(--dark-color);
       padding: 0.8rem 1.5rem;
       border-radius: 5px;
       text-decoration: none;
@@ -122,17 +128,19 @@
     }
     
     .btn:hover {
-      background-color: #e67e00;
+      background-color: #4da5d8;
     }
     
     .features {
       padding: 4rem 0;
+      background-color: var(--secondary-color);
     }
     
     .features h2 {
       text-align: center;
       font-family: 'Poppins', sans-serif;
       margin-bottom: 3rem;
+      color: var(--primary-color);
     }
     
     .features-grid {
@@ -142,11 +150,16 @@
     }
     
     .feature-card {
-      background: white;
+      background: var(--dark-color);
       border-radius: 8px;
       padding: 2rem;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
       text-align: center;
+      transition: transform 0.3s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
     }
     
     .feature-card i {
@@ -158,11 +171,12 @@
     .feature-card h3 {
       font-family: 'Poppins', sans-serif;
       margin-bottom: 1rem;
+      color: var(--light-color);
     }
     
     footer {
       background-color: var(--dark-color);
-      color: white;
+      color: var(--light-color);
       padding: 3rem 0;
     }
     
@@ -175,6 +189,7 @@
     .footer-column h3 {
       font-family: 'Poppins', sans-serif;
       margin-bottom: 1.5rem;
+      color: var(--primary-color);
     }
     
     .footer-column ul {
@@ -186,13 +201,13 @@
     }
     
     .footer-column ul li a {
-      color: #cbd5e1;
+      color: #8f98a0;
       text-decoration: none;
       transition: color 0.3s;
     }
     
     .footer-column ul li a:hover {
-      color: var(--accent-color);
+      color: var(--primary-color);
     }
     
     .copyright {
@@ -201,7 +216,7 @@
       padding-top: 1.5rem;
       border-top: 1px solid rgba(255,255,255,0.1);
       font-size: 0.9rem;
-      color: #94a3b8;
+      color: #8f98a0;
     }
     
     /* Chat widget styling */
@@ -217,7 +232,7 @@
       height: 60px;
       border-radius: 50%;
       background-color: var(--primary-color);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -226,12 +241,12 @@
     }
     
     .chat-button i {
-      color: white;
+      color: var(--dark-color);
       font-size: 24px;
     }
     
     .chat-button:hover {
-      background-color: #1d4ed8;
+      background-color: #4da5d8;
     }
     
     .chat-window {
@@ -241,10 +256,11 @@
       right: 0;
       width: 350px;
       height: 450px;
-      background-color: white;
+      background-color: var(--secondary-color);
       border-radius: 10px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+      box-shadow: 0 5px 25px rgba(0,0,0,0.4);
       overflow: hidden;
+      border: 1px solid var(--primary-color);
     }
     
     .chat-window.active {
@@ -253,7 +269,7 @@
     
     .chat-header {
       background-color: var(--primary-color);
-      color: white;
+      color: var(--dark-color);
       padding: 15px;
       font-weight: 600;
       display: flex;
@@ -270,25 +286,29 @@
       height: 330px;
       padding: 15px;
       overflow-y: auto;
+      background-color: var(--secondary-color);
+      color: var(--light-color);
     }
     
     .chat-input {
       display: flex;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid #2a475e;
       padding: 10px;
     }
     
     .chat-input input {
       flex: 1;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #2a475e;
       border-radius: 20px;
       padding: 8px 15px;
       outline: none;
+      background-color: var(--dark-color);
+      color: var(--light-color);
     }
     
     .chat-input button {
       background-color: var(--primary-color);
-      color: white;
+      color: var(--dark-color);
       border: none;
       border-radius: 20px;
       margin-left: 10px;
@@ -298,7 +318,7 @@
     }
     
     .chat-input button:hover {
-      background-color: #1d4ed8;
+      background-color: #4da5d8;
     }
   </style>
 </head>
@@ -306,14 +326,14 @@
   <!-- Header Section -->
   <header>
     <div class="container header-content">
-      <div class="logo">Business<span>Solutions</span></div>
+      <div class="logo">Game<span>Vault</span></div>
       <nav>
         <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Services</a></li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Pricing</a></li>
-          <li><a href="#">Contact</a></li>
+          <li><a href="#">Store</a></li>
+          <li><a href="#">Library</a></li>
+          <li><a href="#">Community</a></li>
+          <li><a href="#">Workshop</a></li>
+          <li><a href="#">Support</a></li>
         </ul>
       </nav>
     </div>
@@ -322,31 +342,31 @@
   <!-- Hero Section -->
   <section class="hero">
     <div class="container">
-      <h1>Transform Your Business Today</h1>
-      <p>We provide innovative solutions to help your business grow and succeed in today's competitive market. Our team of experts is here to support you every step of the way.</p>
-      <a href="#" class="btn">Get Started</a>
+      <h1>Your Digital Gaming Experience</h1>
+      <p>Discover, download and play thousands of games from indie to AAA titles. Join our gaming community and take your gaming experience to the next level.</p>
+      <a href="#" class="btn">Explore Games</a>
     </div>
   </section>
 
   <!-- Features Section -->
   <section class="features">
     <div class="container">
-      <h2>Our Services</h2>
+      <h2>Featured Categories</h2>
       <div class="features-grid">
         <div class="feature-card">
-          <i class="fas fa-chart-line"></i>
-          <h3>Business Analytics</h3>
-          <p>Gain valuable insights into your business performance with our advanced analytics tools and expert analysis.</p>
+          <i class="fas fa-gamepad"></i>
+          <h3>Action & Adventure</h3>
+          <p>Experience heart-pumping action and epic adventures with our collection of acclaimed titles from top developers.</p>
         </div>
         <div class="feature-card">
-          <i class="fas fa-cogs"></i>
-          <h3>Process Optimization</h3>
-          <p>Streamline your operations and improve efficiency with our proven process optimization methodologies.</p>
+          <i class="fas fa-chess"></i>
+          <h3>Strategy & Simulation</h3>
+          <p>Test your tactical skills and creative thinking with our strategy and simulation games.</p>
         </div>
         <div class="feature-card">
           <i class="fas fa-users"></i>
-          <h3>Customer Engagement</h3>
-          <p>Build stronger relationships with your customers through our innovative engagement strategies and tools.</p>
+          <h3>Multiplayer & Co-op</h3>
+          <p>Connect with friends and players worldwide in our extensive collection of multiplayer and cooperative games.</p>
         </div>
       </div>
     </div>
@@ -357,44 +377,44 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-column">
-          <h3>Company</h3>
+          <h3>GameVault</h3>
           <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Our Team</a></li>
+            <li><a href="#">About</a></li>
             <li><a href="#">Careers</a></li>
-            <li><a href="#">News & Press</a></li>
+            <li><a href="#">Partner Program</a></li>
+            <li><a href="#">Gift Cards</a></li>
           </ul>
         </div>
         <div class="footer-column">
-          <h3>Services</h3>
+          <h3>Games</h3>
           <ul>
-            <li><a href="#">Consulting</a></li>
-            <li><a href="#">Implementation</a></li>
-            <li><a href="#">Training</a></li>
-            <li><a href="#">Support</a></li>
+            <li><a href="#">New Releases</a></li>
+            <li><a href="#">Top Sellers</a></li>
+            <li><a href="#">Upcoming</a></li>
+            <li><a href="#">Special Offers</a></li>
           </ul>
         </div>
         <div class="footer-column">
-          <h3>Resources</h3>
+          <h3>Community</h3>
           <ul>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Whitepapers</a></li>
-            <li><a href="#">Case Studies</a></li>
-            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Forums</a></li>
+            <li><a href="#">Workshop</a></li>
+            <li><a href="#">Game Stats</a></li>
+            <li><a href="#">Developer Hub</a></li>
           </ul>
         </div>
         <div class="footer-column">
-          <h3>Contact</h3>
+          <h3>Support</h3>
           <ul>
-            <li><a href="#">info@businesssolutions.com</a></li>
-            <li><a href="#">+1 (555) 123-4567</a></li>
-            <li><a href="#">123 Business Ave, Suite 100</a></li>
-            <li><a href="#">New York, NY 10001</a></li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Refunds</a></li>
+            <li><a href="#">System Status</a></li>
+            <li><a href="#">Contact Support</a></li>
           </ul>
         </div>
       </div>
       <div class="copyright">
-        <p>&copy; 2025 BusinessSolutions. All rights reserved.</p>
+        <p>&copy; 2025 GameVault Entertainment. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -402,18 +422,18 @@
   <!-- Chat Widget Integration -->
   <div class="chat-widget-container">
     <div class="chat-button" id="chatButton">
-      <i class="fas fa-comments"></i>
+      <i class="fas fa-headset"></i>
     </div>
     <div class="chat-window" id="chatWindow">
       <div class="chat-header">
-        <span>Customer Support</span>
+        <span>Gaming Support</span>
         <span class="close-chat" id="closeChat">&times;</span>
       </div>
       <div class="chat-messages" id="chatMessages">
         <!-- Messages will be added here dynamically -->
       </div>
       <div class="chat-input">
-        <input type="text" id="chatInput" placeholder="Type your message...">
+        <input type="text" id="chatInput" placeholder="Need help with a game?">
         <button id="sendMessage">Send</button>
       </div>
     </div>
