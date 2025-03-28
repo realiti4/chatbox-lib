@@ -8,6 +8,7 @@ export default defineConfig({
     'process.env': {}
   },
   build: {
+    target: 'es2023',
     lib: {
       entry: resolve(__dirname, 'src/main.tsx'),
       name: 'ChatWidget',

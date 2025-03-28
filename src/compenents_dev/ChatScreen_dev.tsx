@@ -47,7 +47,7 @@ const scrollToBottom = throttle(
   80
 );
 
-export default function ChatScreen() {
+export default function ChatScreen_dev() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const textarea = useOptimizedTextarea(prefilledMsg.content());
@@ -171,16 +171,29 @@ export default function ChatScreen() {
               key={msg.id}
               msg={{
                 id: msg.id,
+                convId: 'conv-1', // Dummy conversation ID
                 content: msg.content,
                 role: msg.role,
                 type: 'text',
                 timestamp: msg.id,
                 parent: -1,
-                children: [],
-                isPending: msg.isPending
+                children: []
               }}
               siblingLeafNodeIds={[]}
               siblingCurrIdx={0}
+              isPending={!!msg.isPending}
+              onRegenerateMessage={(msg) => {
+                // Implement regeneration logic here
+                console.log('Regenerate message:', msg);
+              }}
+              onEditMessage={(msg, content) => {
+                // Implement edit logic here
+                console.log('Edit message:', msg, 'with content:', content);
+              }}
+              onChangeSibling={(siblingId) => {
+                // Implement sibling change logic here
+                console.log('Change to sibling:', siblingId);
+              }}
             />
           ))}
         </div>

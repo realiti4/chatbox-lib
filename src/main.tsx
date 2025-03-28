@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import ChatWidget from './components/ChatWidget';
+// import ChatWidget from './components/ChatWidget';
+import ChatScreen_dev from './compenents_dev/ChatScreen_dev'
 // import './index.css';
 
 // Extend Window interface
@@ -24,7 +25,7 @@ export function initChatWidget(containerId = 'chat-widget-container') {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <ChatWidget />
+      <ChatScreen_dev />
     </React.StrictMode>
   );
 }

@@ -306,5 +306,6 @@ export function escapeBrackets(text: string): string {
 }
 
 export function escapeMhchem(text: string) {
-  return text.replaceAll('$\\ce{', '$\\\\ce{').replaceAll('$\\pu{', '$\\\\pu{');
+  return text.replace(/\$\\ce\{/g, '$\\\\ce{').replace(/\$\\pu\{/g, '$\\\\pu{');
+  // return text.replaceAll('$\\ce{', '$\\\\ce{').replaceAll('$\\pu{', '$\\\\pu{');
 }
