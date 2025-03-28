@@ -30,6 +30,7 @@ export default function ChatMessage({
   onChangeSibling(sibling: Message['id']): void;
   isPending?: boolean;
 }) {
+  // @ts-ignore
   const { viewingChat, config } = useAppContext();
   const [editingContent, setEditingContent] = useState<string | null>(null);
   const timings = useMemo(
@@ -74,7 +75,7 @@ export default function ChatMessage({
     return { content: actualContent, thought, isThinking };
   }, [msg]);
 
-  if (!viewingChat) return null;
+  // if (!viewingChat) return null;
 
   return (
     <div className="group" id={id}>

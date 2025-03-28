@@ -281,7 +281,7 @@ export interface OptimizedTextareaValue {
   value: () => string;
   setValue: (value: string) => void;
   focus: () => void;
-  ref: React.RefObject<HTMLTextAreaElement>;
+  ref: React.RefObject<HTMLTextAreaElement | null>;
 }
 
 // This is a workaround to prevent the textarea from re-rendering when the inner content changes

@@ -1,13 +1,12 @@
 import './App.css'
 import './index.scss';
-import Chat from './components/Chat'
-import ChatScreen from './compenents_dev/ChatScreen'
+import ChatScreen_dev from './compenents_dev/ChatScreen_dev'
 
 function App_dev() {
   return (
     <div className="app dev-mode">
       <h1>Simple Chat App</h1>
-      <ChatScreen />
+      <ChatScreen_dev />
       <p className="read-the-docs">
         This is a simple chat application with dummy responses
       </p>
