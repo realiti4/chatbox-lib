@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import ChatMessage from './ChatMessage';
-import { cleanCurrentUrl, throttle } from '../utils/misc';
+import { throttle } from '../utils/misc';
 import { chatApi } from '../services/chatApi';
 
 // Simplified message structure
@@ -10,24 +10,6 @@ export interface Message {
   content: string;
   isPending?: boolean;
 }
-
-/**
- * If the current URL contains "?m=...", prefill the message input with the value.
- * If the current URL contains "?q=...", prefill and SEND the message.
- */
-const prefilledMsg = {
-  content() {
-    const url = new URL(window.location.href);
-    return url.searchParams.get('m') ?? url.searchParams.get('q') ?? '';
-  },
-  shouldSend() {
-    const url = new URL(window.location.href);
-    return url.searchParams.has('q');
-  },
-  clear() {
-    cleanCurrentUrl(['m', 'q']);
-  },
-};
 
 const scrollToBottom = throttle(
   (requiresNearBottom: boolean, delay: number = 80) => {
@@ -50,7 +32,7 @@ const scrollToBottom = throttle(
 export default function ChatScreen_dev() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const textarea = useOptimizedTextarea(prefilledMsg.content());
+  const textarea = useOptimizedTextarea("");
   const [pendingMessage, setPendingMessage] = useState<Message | null>(null);
   const abortController = useRef<AbortController | null>(null);
 
@@ -90,7 +72,7 @@ export default function ChatScreen_dev() {
     try {
       // Optional: Show "typing" effect immediately if desired
       setPendingMessage(prev => prev ? { ...prev, content: '...' } : null);
-      // await new Promise(resolve => setTimeout(resolve, 500)); // Simulate typing delay
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate typing delay
 
       // Use the dummy chatApi instead of real API
       const response = await chatApi.sendMessage(userContent);
@@ -138,8 +120,11 @@ export default function ChatScreen_dev() {
 
   const sendNewMessage = async () => {
     const lastInpMsg = textarea.value();
+
     if (lastInpMsg.trim().length === 0 || isGenerating) return;
+    
     textarea.setValue('');
+
     if (!(await sendMessage(lastInpMsg))) {
       // restore the input message if failed
       textarea.setValue(lastInpMsg);
@@ -147,14 +132,8 @@ export default function ChatScreen_dev() {
   };
 
   useEffect(() => {
-    if (prefilledMsg.shouldSend()) {
-      // send the prefilled message if needed
-      sendNewMessage();
-    } else {
-      // otherwise, focus on the input
-      textarea.focus();
-    }
-    prefilledMsg.clear();
+    textarea.focus();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [textarea.ref]);
 

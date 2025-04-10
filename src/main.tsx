@@ -4,6 +4,9 @@ import { createRoot } from 'react-dom/client';
 import ChatScreen_dev from './compenents_dev/ChatScreen_dev'
 // import './index.css';
 
+// Track initialization state
+let widgetInitialized = false;
+
 // Extend Window interface
 declare global {
   interface Window {
@@ -13,6 +16,12 @@ declare global {
 
 // This function will be exposed to the global scope
 export function initChatWidget(containerId = 'chat-widget-container') {
+  // Prevent multiple initializations
+  if (widgetInitialized) {
+    console.warn('Chat widget already initialized');
+    return;
+  }
+  
   // Create container if it doesn't exist
   let container = document.getElementById(containerId);
   
@@ -28,13 +37,16 @@ export function initChatWidget(containerId = 'chat-widget-container') {
       <ChatScreen_dev />
     </React.StrictMode>
   );
+  
+  // Mark as initialized
+  widgetInitialized = true;
 }
 
 // Auto-initialize if script is loaded directly
 if (typeof window !== 'undefined') {
   window.initChatWidget = initChatWidget;
   
-  // Auto-initialize if no configuration is needed
+  // Use a single initialization approach
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
     setTimeout(initChatWidget, 1);
   } else {

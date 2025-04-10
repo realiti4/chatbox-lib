@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App_dev from './App_dev';
-import './index.css';
+// import './index.css';
 
 // Development entry point
 const rootElement = document.getElementById('root');
