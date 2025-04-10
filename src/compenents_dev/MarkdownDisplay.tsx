@@ -9,8 +9,6 @@ import 'katex/dist/katex.min.css';
 import { classNames, copyStr } from '../utils/misc';
 import { ElementContent, Root } from 'hast';
 import { visit } from 'unist-util-visit';
-import { useAppContext } from '../utils/app.context';
-import { CanvasType } from '../utils/types';
 
 export default function MarkdownDisplay({
   content,
@@ -47,8 +45,7 @@ const CodeBlockButtons: React.ElementType<
   React.ClassAttributes<HTMLButtonElement> &
     React.HTMLAttributes<HTMLButtonElement> &
     ExtraProps & { origContent: string; isGenerating?: boolean }
-> = ({ node, origContent, isGenerating }) => {
-  const { config } = useAppContext();
+> = ({ node, origContent }) => {
   const startOffset = node?.position?.start.offset ?? 0;
   const endOffset = node?.position?.end.offset ?? 0;
 
@@ -61,19 +58,6 @@ const CodeBlockButtons: React.ElementType<
     [origContent, startOffset, endOffset]
   );
 
-  const codeLanguage = useMemo(
-    () =>
-      origContent
-        .substring(startOffset, startOffset + 10)
-        .match(/^```([^\n]+)\n/)?.[1] ?? '',
-    [origContent, startOffset]
-  );
-
-  const canRunCode =
-    !isGenerating &&
-    config.pyIntepreterEnabled &&
-    codeLanguage.startsWith('py');
-
   return (
     <div
       className={classNames({
@@ -82,12 +66,6 @@ const CodeBlockButtons: React.ElementType<
       })}
     >
       <CopyButton className="badge btn-mini" content={copiedContent} />
-      {canRunCode && (
-        <RunPyCodeButton
-          className="badge btn-mini ml-2"
-          content={copiedContent}
-        />
-      )}
     </div>
   );
 };
@@ -111,31 +89,6 @@ export const CopyButton = ({
     >
       {copied ? 'Copied!' : '📋 Copy'}
     </button>
-  );
-};
-
-export const RunPyCodeButton = ({
-  content,
-  className,
-}: {
-  content: string;
-  className?: string;
-}) => {
-  const { setCanvasData } = useAppContext();
-  return (
-    <>
-      <button
-        className={className}
-        onClick={() =>
-          setCanvasData({
-            type: CanvasType.PY_INTERPRETER,
-            content,
-          })
-        }
-      >
-        ▶️ Run
-      </button>
-    </>
   );
 };
 
