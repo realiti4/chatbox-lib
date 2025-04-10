@@ -254,8 +254,8 @@
       position: absolute;
       bottom: 80px;
       right: 0;
-      width: 350px;
-      height: 450px;
+      width: 480px;
+      height: 600px;
       background-color: var(--secondary-color);
       border-radius: 10px;
       box-shadow: 0 5px 25px rgba(0,0,0,0.4);
@@ -420,7 +420,7 @@
   </footer>
   
   <!-- Chat Widget Integration -->
-  <div class="chat-widget-container">
+  <div id="chat-widget-container" class="chat-widget-container">
     <div class="chat-button" id="chatButton">
       <i class="fas fa-headset"></i>
     </div>
@@ -430,7 +430,6 @@
         <span class="close-chat" id="closeChat">&times;</span>
       </div>
       <div class="chat-messages" id="chatMessages">
-        <!-- Messages will be added here dynamically -->
       </div>
       <div class="chat-input">
         <input type="text" id="chatInput" placeholder="Need help with a game?">
@@ -445,6 +444,16 @@
     // Optional: Configure the widget
     window.addEventListener('DOMContentLoaded', function() {
       window.initChatWidget();
+    });
+
+    // Chat button toggle
+    document.getElementById('chatButton').addEventListener('click', function() {
+      document.getElementById('chatWindow').classList.toggle('active');
+    });
+
+    document.getElementById('closeChat').addEventListener('click', function(e) {
+      document.getElementById('chatWindow').classList.remove('active');
+      e.stopPropagation();
     });
   </script>
 </body>

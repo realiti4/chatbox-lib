@@ -34,12 +34,22 @@
 }
 .chat-screen {
   max-width: 900px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .chat-bubble-base-300 {
   --tw-bg-opacity: 1;
   --tw-text-opacity: 1;
   @apply bg-base-300 text-base-content;
+}
+
+// Chat widget specific styles
+#main-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
 }
 
 /* Highlight.js */

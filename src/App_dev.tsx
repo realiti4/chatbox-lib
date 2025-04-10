@@ -1,6 +1,6 @@
 // import './App.css'
 import './index.scss';
-import ChatScreen_dev from './compenents_dev/ChatScreen_dev'
+import ChatScreen from './compenents_dev/ChatScreen'
 
 function App_dev() {
   return (
@@ -9,7 +9,7 @@ function App_dev() {
         <h1>Simple Chat App</h1>
       </div>
       <div className="chat-container">
-        <ChatScreen_dev />
+        <ChatScreen />
       </div>
       <p className="read-the-docs">
         This is a simple chat application with dummy responses

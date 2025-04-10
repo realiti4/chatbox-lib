@@ -1,72 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { CallbackGeneratedChunk, useAppContext } from '../utils/app.context';
+import { useEffect, useRef, useState } from 'react';
 import ChatMessage from './ChatMessage';
-import { Message, PendingMessage } from '../utils/types';
-import { classNames, cleanCurrentUrl, throttle } from '../utils/misc';
-import StorageUtils from '../utils/storage';
+import { throttle } from '../utils/misc';
+import { chatApi } from '../services/chatApi';
 
-/**
- * A message display is a message node with additional information for rendering.
- * For example, siblings of the message node are stored as their last node (aka leaf node).
- */
-export interface MessageDisplay {
-  msg: Message | PendingMessage;
-  siblingLeafNodeIds: Message['id'][];
-  siblingCurrIdx: number;
+// Simplified message structure
+export interface Message {
+  id: number;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
   isPending?: boolean;
-}
-
-/**
- * If the current URL contains "?m=...", prefill the message input with the value.
- * If the current URL contains "?q=...", prefill and SEND the message.
- */
-const prefilledMsg = {
-  content() {
-    const url = new URL(window.location.href);
-    return url.searchParams.get('m') ?? url.searchParams.get('q') ?? '';
-  },
-  shouldSend() {
-    const url = new URL(window.location.href);
-    return url.searchParams.has('q');
-  },
-  clear() {
-    cleanCurrentUrl(['m', 'q']);
-  },
-};
-
-function getListMessageDisplay(
-  msgs: Readonly<Message[]>,
-  leafNodeId: Message['id']
-): MessageDisplay[] {
-  const currNodes = StorageUtils.filterByLeafNodeId(msgs, leafNodeId, true);
-  const res: MessageDisplay[] = [];
-  const nodeMap = new Map<Message['id'], Message>();
-  for (const msg of msgs) {
-    nodeMap.set(msg.id, msg);
-  }
-  // find leaf node from a message node
-  const findLeafNode = (msgId: Message['id']): Message['id'] => {
-    let currNode: Message | undefined = nodeMap.get(msgId);
-    while (currNode) {
-      if (currNode.children.length === 0) break;
-      currNode = nodeMap.get(currNode.children.at(-1) ?? -1);
-    }
-    return currNode?.id ?? -1;
-  };
-  // traverse the current nodes
-  for (const msg of currNodes) {
-    const parentNode = nodeMap.get(msg.parent ?? -1);
-    if (!parentNode) continue;
-    const siblings = parentNode.children;
-    if (msg.type !== 'root') {
-      res.push({
-        msg,
-        siblingLeafNodeIds: siblings.map(findLeafNode),
-        siblingCurrIdx: siblings.indexOf(msg.id),
-      });
-    }
-  }
-  return res;
 }
 
 const scrollToBottom = throttle(
@@ -88,156 +30,149 @@ const scrollToBottom = throttle(
 );
 
 export default function ChatScreen() {
-  const {
-    viewingChat,
-    sendMessage,
-    isGenerating,
-    stopGenerating,
-    pendingMessages,
-    canvasData,
-    replaceMessageAndGenerate,
-  } = useAppContext();
-  const textarea = useOptimizedTextarea(prefilledMsg.content());
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const textarea = useOptimizedTextarea("");
+  const [pendingMessage, setPendingMessage] = useState<Message | null>(null);
+  const abortController = useRef<AbortController | null>(null);
 
-  // TODO: improve this when we have "upload file" feature
-  const currExtra: Message['extra'] = undefined;
+  const sendMessage = async (content: string) => {
+    if (content.trim().length === 0 || isGenerating) return false;
+    
+    // Add user message
+    const userMsgId = Date.now();
+    const userMsg: Message = {
+      id: userMsgId,
+      role: 'user',
+      content
+    };
+    
+    setMessages(prev => [...prev, userMsg]);
+    scrollToBottom(false);
+    
+    // Generate AI response
+    await generateMessage(content);
+    return true;
+  };
 
-  // keep track of leaf node for rendering
-  const [currNodeId, setCurrNodeId] = useState<number>(-1);
-  const messages: MessageDisplay[] = useMemo(() => {
-    if (!viewingChat) return [];
-    else return getListMessageDisplay(viewingChat.messages, currNodeId);
-  }, [currNodeId, viewingChat]);
+  const generateMessage = async (userContent: string) => {
+    if (isGenerating) return;
 
-  const currConvId = viewingChat?.conv.id ?? null;
-  const pendingMsg: PendingMessage | undefined =
-    pendingMessages[currConvId ?? ''];
+    setIsGenerating(true);
+    const pendingId = Date.now() + 1;
+    const newPendingMsg: Message = {
+      id: pendingId,
+      role: 'assistant',
+      content: '',
+      isPending: true
+    };
 
-  useEffect(() => {
-    // reset to latest node when conversation changes
-    setCurrNodeId(-1);
-    // scroll to bottom when conversation changes
-    scrollToBottom(false, 1);
-  }, [currConvId]);
+    setPendingMessage(newPendingMsg); // Show initial pending state
 
-  const onChunk: CallbackGeneratedChunk = (currLeafNodeId?: Message['id']) => {
-    if (currLeafNodeId) {
-      setCurrNodeId(currLeafNodeId);
+    try {
+      // Optional: Show "typing" effect immediately if desired
+      setPendingMessage(prev => prev ? { ...prev, content: '...' } : null);
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate typing delay
+
+      // Use the dummy chatApi instead of real API
+      const response = await chatApi.sendMessage(userContent);
+
+      // Transform the response to match our Message interface
+      const assistantMessage: Message = {
+        id: pendingId, // Use the same ID
+        role: 'assistant',
+        content: response.text,
+        isPending: false // Mark as not pending anymore
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+
+      // We no longer need to show it separately as it's now in the main list
+      setPendingMessage(null);
+
+    } catch (err) {
+      console.error(err);
+      alert((err as any)?.message ?? 'Failed to get response');
+      // Optionally add an error message to the chat
+      // setMessages(prev => [...prev, { id: Date.now(), role: 'system', content: 'Error fetching response.' }]);
+
+      // *** FIX: Ensure pending message is cleared on error too ***
+      setPendingMessage(null);
+
+    } finally {
+      // *** FIX: Removed the logic that added the message here ***
+      // The message is now added in the `try` block upon success.
+
+      setIsGenerating(false);
+      abortController.current = null; // Assuming chatApi doesn't use the abort controller here
+      scrollToBottom(false);
     }
-    scrollToBottom(true);
+  };
+
+  const stopGenerating = () => {
+    if (abortController.current) {
+      abortController.current.abort();
+      abortController.current = null;
+      setIsGenerating(false);
+      setPendingMessage(null);
+    }
   };
 
   const sendNewMessage = async () => {
     const lastInpMsg = textarea.value();
-    if (lastInpMsg.trim().length === 0 || isGenerating(currConvId ?? ''))
-      return;
+
+    if (lastInpMsg.trim().length === 0 || isGenerating) return;
+    
     textarea.setValue('');
-    scrollToBottom(false);
-    setCurrNodeId(-1);
-    // get the last message node
-    const lastMsgNodeId = messages.at(-1)?.msg.id ?? null;
-    if (
-      !(await sendMessage(
-        currConvId,
-        lastMsgNodeId,
-        lastInpMsg,
-        currExtra,
-        onChunk
-      ))
-    ) {
+
+    if (!(await sendMessage(lastInpMsg))) {
       // restore the input message if failed
       textarea.setValue(lastInpMsg);
     }
   };
 
-  const handleEditMessage = async (msg: Message, content: string) => {
-    if (!viewingChat) return;
-    setCurrNodeId(msg.id);
-    scrollToBottom(false);
-    await replaceMessageAndGenerate(
-      viewingChat.conv.id,
-      msg.parent,
-      content,
-      msg.extra,
-      onChunk
-    );
-    setCurrNodeId(-1);
-    scrollToBottom(false);
-  };
-
-  const handleRegenerateMessage = async (msg: Message) => {
-    if (!viewingChat) return;
-    setCurrNodeId(msg.parent);
-    scrollToBottom(false);
-    await replaceMessageAndGenerate(
-      viewingChat.conv.id,
-      msg.parent,
-      null,
-      msg.extra,
-      onChunk
-    );
-    setCurrNodeId(-1);
-    scrollToBottom(false);
-  };
-
-  const hasCanvas = !!canvasData;
-
   useEffect(() => {
-    if (prefilledMsg.shouldSend()) {
-      // send the prefilled message if needed
-      sendNewMessage();
-    } else {
-      // otherwise, focus on the input
-      textarea.focus();
-    }
-    prefilledMsg.clear();
-    // no need to keep track of sendNewMessage
+    textarea.focus();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [textarea.ref]);
 
-  // due to some timing issues of StorageUtils.appendMsg(), we need to make sure the pendingMsg is not duplicated upon rendering (i.e. appears once in the saved conversation and once in the pendingMsg)
-  const pendingMsgDisplay: MessageDisplay[] =
-    pendingMsg && messages.at(-1)?.msg.id !== pendingMsg.id
-      ? [
-          {
-            msg: pendingMsg,
-            siblingLeafNodeIds: [],
-            siblingCurrIdx: 0,
-            isPending: true,
-          },
-        ]
-      : [];
-
   return (
-    <div
-      className={classNames({
-        'grid lg:gap-8 grow transition-[300ms]': true,
-        'grid-cols-[1fr_0fr] lg:grid-cols-[1fr_1fr]': hasCanvas, // adapted for mobile
-        'grid-cols-[1fr_0fr]': !hasCanvas,
-      })}
-    >
-      <div
-        className={classNames({
-          'flex flex-col w-full max-w-[900px] mx-auto': true,
-          'hidden lg:flex': hasCanvas, // adapted for mobile
-          flex: !hasCanvas,
-        })}
-      >
+    <div className="grid grid-cols-[1fr_0fr] grow transition-[300ms] h-full flex flex-col">
+      <div className="flex flex-col w-full max-w-[900px] mx-auto h-full">
         {/* chat messages */}
-        <div id="messages-list" className="grow">
+        <div id="main-scroll" className="grow overflow-y-auto">
           <div className="mt-auto flex justify-center">
-            {/* placeholder to shift the message to the bottom */}
-            {viewingChat ? '' : 'Send a message to start'}
+            {messages.length === 0 ? 'Send a message to start' : ''}
           </div>
-          {[...messages, ...pendingMsgDisplay].map((msg) => (
+          {[...messages, ...(pendingMessage ? [pendingMessage] : [])].map((msg) => (
             <ChatMessage
-              key={msg.msg.id}
-              msg={msg.msg}
-              siblingLeafNodeIds={msg.siblingLeafNodeIds}
-              siblingCurrIdx={msg.siblingCurrIdx}
-              onRegenerateMessage={handleRegenerateMessage}
-              onEditMessage={handleEditMessage}
-              onChangeSibling={setCurrNodeId}
+              key={msg.id}
+              msg={{
+                id: msg.id,
+                convId: 'conv-1', // Dummy conversation ID
+                content: msg.content,
+                role: msg.role,
+                type: 'text',
+                timestamp: msg.id,
+                parent: -1,
+                children: []
+              }}
+              siblingLeafNodeIds={[]}
+              siblingCurrIdx={0}
+              isPending={!!msg.isPending}
+              onRegenerateMessage={(msg) => {
+                // Implement regeneration logic here
+                console.log('Regenerate message:', msg);
+              }}
+              onEditMessage={(msg, content) => {
+                // Implement edit logic here
+                console.log('Edit message:', msg, 'with content:', content);
+              }}
+              onChangeSibling={(siblingId) => {
+                // Implement sibling change logic here
+                console.log('Change to sibling:', siblingId);
+              }}
             />
           ))}
         </div>
@@ -259,10 +194,10 @@ export default function ChatScreen() {
             id="msg-input"
             dir="auto"
           ></textarea>
-          {isGenerating(currConvId ?? '') ? (
+          {isGenerating ? (
             <button
               className="btn btn-neutral ml-2"
-              onClick={() => stopGenerating(currConvId ?? '')}
+              onClick={stopGenerating}
             >
               Stop
             </button>

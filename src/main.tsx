@@ -1,8 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 // import ChatWidget from './components/ChatWidget';
-import ChatScreen_dev from './compenents_dev/ChatScreen_dev'
+import ChatScreen from './compenents_dev/ChatScreen'
 // import './index.css';
+import './index.scss';
 
 // Track initialization state
 let widgetInitialized = false;
@@ -21,10 +22,12 @@ export function initChatWidget(containerId = 'chat-widget-container') {
     console.warn('Chat widget already initialized');
     return;
   }
-  
+
   // Create container if it doesn't exist
+  containerId = 'chatWindow';
+
   let container = document.getElementById(containerId);
-  
+
   if (!container) {
     container = document.createElement('div');
     container.id = containerId;
@@ -34,7 +37,7 @@ export function initChatWidget(containerId = 'chat-widget-container') {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <ChatScreen_dev />
+      <ChatScreen />
     </React.StrictMode>
   );
   
@@ -46,10 +49,10 @@ export function initChatWidget(containerId = 'chat-widget-container') {
 if (typeof window !== 'undefined') {
   window.initChatWidget = initChatWidget;
   
-  // Use a single initialization approach
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    setTimeout(initChatWidget, 1);
-  } else {
-    document.addEventListener('DOMContentLoaded', () => initChatWidget());
-  }
+  // // Use a single initialization approach
+  // if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  //   setTimeout(initChatWidget, 1);
+  // } else {
+  //   document.addEventListener('DOMContentLoaded', () => initChatWidget());
+  // }
 }
