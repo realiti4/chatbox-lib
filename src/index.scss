@@ -16,27 +16,23 @@
   li {
     all: revert;
   }
+
   pre {
     @apply whitespace-pre-wrap rounded-lg p-2;
     border: 1px solid currentColor;
   }
+
   p {
     @apply mb-2;
   }
-  /* TODO: fix markdown table */
 }
 
 .show-on-hover {
   @apply md:opacity-0 md:group-hover:opacity-100;
 }
+
 .btn-mini {
   @apply cursor-pointer hover:shadow-md;
-}
-.chat-screen {
-  max-width: 900px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
 .chat-bubble-base-300 {
@@ -45,34 +41,33 @@
   @apply bg-base-300 text-base-content;
 }
 
-// Chat widget specific styles
-#main-scroll {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-}
-
 /* Highlight.js */
 [data-color-scheme='light'] {
   @include meta.load-css('highlight.js/styles/stackoverflow-light');
+
   .dark-color {
     @apply bg-base-content text-base-100;
   }
 }
+
 [data-color-scheme='dark'] {
   @include meta.load-css('highlight.js/styles/stackoverflow-dark');
 }
+
 [data-color-scheme='auto'] {
   @media (prefers-color-scheme: light) {
     @include meta.load-css('highlight.js/styles/stackoverflow-light');
+
     .dark-color {
       @apply bg-base-content text-base-100;
     }
   }
+
   @media (prefers-color-scheme: dark) {
     @include meta.load-css('highlight.js/styles/stackoverflow-dark');
   }
 }
+
 .hljs {
   background: transparent !important;
   padding: 0.5em !important;

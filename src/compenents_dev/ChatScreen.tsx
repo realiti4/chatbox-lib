@@ -35,10 +35,11 @@ export default function ChatScreen() {
   const textarea = useOptimizedTextarea("");
   const [pendingMessage, setPendingMessage] = useState<Message | null>(null);
   const abortController = useRef<AbortController | null>(null);
+  const mainScrollRef = useRef<HTMLDivElement>(null);
 
   const sendMessage = async (content: string) => {
     if (content.trim().length === 0 || isGenerating) return false;
-    
+
     // Add user message
     const userMsgId = Date.now();
     const userMsg: Message = {
@@ -46,10 +47,10 @@ export default function ChatScreen() {
       role: 'user',
       content
     };
-    
+
     setMessages(prev => [...prev, userMsg]);
     scrollToBottom(false);
-    
+
     // Generate AI response
     await generateMessage(content);
     return true;
@@ -122,7 +123,7 @@ export default function ChatScreen() {
     const lastInpMsg = textarea.value();
 
     if (lastInpMsg.trim().length === 0 || isGenerating) return;
-    
+
     textarea.setValue('');
 
     if (!(await sendMessage(lastInpMsg))) {
@@ -138,57 +139,68 @@ export default function ChatScreen() {
   }, [textarea.ref]);
 
   return (
-    <div className="grid grid-cols-[1fr_0fr] grow transition-[300ms] h-full flex flex-col">
+    <div className="flex flex-col h-full overflow-hidden">
       <div className="flex flex-col w-full max-w-[900px] mx-auto h-full">
-        {/* chat messages */}
-        <div id="main-scroll" className="grow overflow-y-auto">
-          <div className="mt-auto flex justify-center">
-            {messages.length === 0 ? 'Send a message to start' : ''}
+        <div
+          id="main-scroll"
+          ref={mainScrollRef}
+          className="grow overflow-y-auto min-h-0 p-4" // Added padding here instead of CSS
+        >
+          <div className={`flex flex-col ${messages.length > 0 ? '' : 'mt-auto'}`}>
+            {messages.length === 0 && !pendingMessage ? (
+              <div className="text-center text-gray-500 p-4">Send a message to start</div>
+            ) : (
+              <>
+                {[...messages, ...(pendingMessage ? [pendingMessage] : [])].map((msg) => (
+                  <ChatMessage
+                    key={msg.id}
+                    msg={{
+                      id: msg.id,
+                      convId: 'conv-1',
+                      content: msg.content,
+                      role: msg.role,
+                      type: 'text',
+                      timestamp: msg.id,
+                      parent: -1,
+                      children: []
+                    }}
+                    siblingLeafNodeIds={[]}
+                    siblingCurrIdx={0}
+                    isPending={!!msg.isPending}
+                    onRegenerateMessage={() => { }}
+                    onEditMessage={() => { }}
+                    onChangeSibling={() => { }}
+                  />
+                ))}
+              </>
+            )}
           </div>
-          {[...messages, ...(pendingMessage ? [pendingMessage] : [])].map((msg) => (
-            <ChatMessage
-              key={msg.id}
-              msg={{
-                id: msg.id,
-                convId: 'conv-1', // Dummy conversation ID
-                content: msg.content,
-                role: msg.role,
-                type: 'text',
-                timestamp: msg.id,
-                parent: -1,
-                children: []
-              }}
-              siblingLeafNodeIds={[]}
-              siblingCurrIdx={0}
-              isPending={!!msg.isPending}
-              onRegenerateMessage={(msg) => {
-                // Implement regeneration logic here
-                console.log('Regenerate message:', msg);
-              }}
-              onEditMessage={(msg, content) => {
-                // Implement edit logic here
-                console.log('Edit message:', msg, 'with content:', content);
-              }}
-              onChangeSibling={(siblingId) => {
-                // Implement sibling change logic here
-                console.log('Change to sibling:', siblingId);
-              }}
-            />
-          ))}
         </div>
 
-        {/* chat input */}
-        <div className="flex flex-row items-center pt-8 pb-6 sticky bottom-0 bg-base-100">
+        <div className="flex flex-row items-center p-4 border-t border-gray-200 dark:border-gray-700 bg-base-100 flex-shrink-0">
           <textarea
-            className="textarea textarea-bordered w-full"
+            className="textarea textarea-bordered w-full resize-none"
             placeholder="Type a message (Shift+Enter to add a new line)"
             ref={textarea.ref}
+            rows={1} // Start with 1 row
+            style={{ maxHeight: '150px' }} // Limit max height
+            onInput={(e) => { // Auto-resize textarea
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = 'auto';
+              target.style.height = `${target.scrollHeight}px`;
+            }}
             onKeyDown={(e) => {
               if (e.nativeEvent.isComposing || e.keyCode === 229) return;
               if (e.key === 'Enter' && e.shiftKey) return;
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendNewMessage();
+                // Reset height after sending
+                const target = e.target as HTMLTextAreaElement;
+                setTimeout(() => {
+                  target.style.height = 'auto'; // Recalculate based on placeholder or empty content
+                  target.style.height = `${target.scrollHeight}px`;
+                }, 0);
               }
             }}
             id="msg-input"

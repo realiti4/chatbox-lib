@@ -2,7 +2,6 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 // import ChatWidget from './components/ChatWidget';
 import ChatScreen from './compenents_dev/ChatScreen'
-// import './index.css';
 import './index.scss';
 
 // Track initialization state
