@@ -1,6 +1,5 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-// import ChatWidget from './components/ChatWidget';
 import ChatScreen from './compenents_dev/ChatScreen'
 import './index.scss';
 
@@ -15,7 +14,7 @@ declare global {
 }
 
 // This function will be exposed to the global scope
-export function initChatWidget(containerId = 'chat-widget-container') {
+export function initChatWidget(containerId = 'chat-body') {
   // Prevent multiple initializations
   if (widgetInitialized) {
     console.warn('Chat widget already initialized');
@@ -23,8 +22,6 @@ export function initChatWidget(containerId = 'chat-widget-container') {
   }
 
   // Create container if it doesn't exist
-  containerId = 'chatWindow';
-
   let container = document.getElementById(containerId);
 
   if (!container) {

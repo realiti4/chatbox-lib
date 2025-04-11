@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import ChatMessage from './ChatMessage';
 import { throttle } from '../utils/misc';
 import { chatApi } from '../services/chatApi';
+import '../chatbox.css';
 
 // Simplified message structure
 export interface Message {
@@ -139,16 +140,16 @@ export default function ChatScreen() {
   }, [textarea.ref]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="flex flex-col w-full max-w-[900px] mx-auto h-full">
+    <div className="chatbox-container">
+      <div className="chatbox-inner">
         <div
           id="main-scroll"
           ref={mainScrollRef}
-          className="grow overflow-y-auto min-h-0 p-4" // Added padding here instead of CSS
+          className="chatbox-messages"
         >
-          <div className={`flex flex-col ${messages.length > 0 ? '' : 'mt-auto'}`}>
+          <div className={`chatbox-messages-container ${messages.length > 0 ? '' : 'chatbox-messages-container-empty'}`}>
             {messages.length === 0 && !pendingMessage ? (
-              <div className="text-center text-gray-500 p-4">Send a message to start</div>
+              <div className="chatbox-empty-message">Send a message to start</div>
             ) : (
               <>
                 {[...messages, ...(pendingMessage ? [pendingMessage] : [])].map((msg) => (
@@ -177,13 +178,12 @@ export default function ChatScreen() {
           </div>
         </div>
 
-        <div className="flex flex-row items-center p-4 border-t border-gray-200 dark:border-gray-700 bg-base-100 flex-shrink-0">
+        <div className="chatbox-input-container">
           <textarea
-            className="textarea textarea-bordered w-full resize-none"
+            className="chatbox-textarea"
             placeholder="Type a message (Shift+Enter to add a new line)"
             ref={textarea.ref}
             rows={1} // Start with 1 row
-            style={{ maxHeight: '150px' }} // Limit max height
             onInput={(e) => { // Auto-resize textarea
               const target = e.target as HTMLTextAreaElement;
               target.style.height = 'auto';
@@ -208,13 +208,13 @@ export default function ChatScreen() {
           ></textarea>
           {isGenerating ? (
             <button
-              className="btn btn-neutral ml-2"
+              className="chatbox-stop-button"
               onClick={stopGenerating}
             >
               Stop
             </button>
           ) : (
-            <button className="btn btn-primary ml-2" onClick={sendNewMessage}>
+            <button className="chatbox-send-button" onClick={sendNewMessage}>
               Send
             </button>
           )}

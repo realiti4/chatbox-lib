@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useAppContext } from '../utils/app.context';
 import { Message, PendingMessage } from '../utils/types';
-import { classNames } from '../utils/misc';
 import MarkdownDisplay, { CopyButton } from './MarkdownDisplay';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
@@ -78,38 +77,27 @@ export default function ChatMessage({
   // if (!viewingChat) return null;
 
   return (
-    <div className="group" id={id}>
-      <div
-        className={classNames({
-          chat: true,
-          'chat-start': msg.role !== 'user',
-          'chat-end': msg.role === 'user',
-        })}
-      >
-        <div
-          className={classNames({
-            'chat-bubble markdown': true,
-            'chat-bubble-base-300': msg.role !== 'user',
-          })}
-        >
+    <div className="chatbox-message-group" id={id}>
+      <div className={`chatbox-message ${msg.role === 'user' ? 'chatbox-message-user' : 'chatbox-message-assistant'}`}>
+        <div className={`chatbox-bubble chatbox-markdown ${msg.role === 'user' ? 'chatbox-bubble-user' : 'chatbox-bubble-assistant'}`}>
           {/* textarea for editing message */}
           {editingContent !== null && (
             <>
               <textarea
                 dir="auto"
-                className="textarea textarea-bordered bg-base-100 text-base-content max-w-2xl w-[calc(90vw-8em)] h-24"
+                className="chatbox-textarea"
                 value={editingContent}
                 onChange={(e) => setEditingContent(e.target.value)}
               ></textarea>
               <br />
               <button
-                className="btn btn-ghost mt-2 mr-2"
+                className="chatbox-button"
                 onClick={() => setEditingContent(null)}
               >
                 Cancel
               </button>
               <button
-                className="btn mt-2"
+                className="chatbox-button"
                 onClick={() => {
                   if (msg.content !== null) {
                     setEditingContent(null);
@@ -127,51 +115,49 @@ export default function ChatMessage({
               {content === null ? (
                 <>
                   {/* show loading dots for pending message */}
-                  <span className="loading loading-dots loading-md"></span>
+                  <span className="chatbox-loading-dots"></span>
                 </>
               ) : (
                 <>
                   {/* render message as markdown */}
                   <div dir="auto">
                     {thought && (
-                      <details
-                        className="collapse bg-base-200 collapse-arrow mb-4"
-                        open={isThinking && config.showThoughtInProgress}
-                      >
-                        <summary className="collapse-title">
+                      <div className="chatbox-collapsible">
+                        <div className="chatbox-collapsible-header" onClick={(e) => {
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            parent.classList.toggle('chatbox-collapsible-open');
+                          }
+                        }}>
                           {isPending && isThinking ? (
                             <span>
-                              <span
-                                v-if="isGenerating"
-                                className="loading loading-spinner loading-md mr-2"
-                                style={{ verticalAlign: 'middle' }}
-                              ></span>
+                              <span className="chatbox-loading-spinner"></span>
                               <b>Thinking</b>
                             </span>
                           ) : (
                             <b>Thought Process</b>
                           )}
-                        </summary>
-                        <div className="collapse-content">
+                        </div>
+                        <div className="chatbox-collapsible-content">
                           <MarkdownDisplay
                             content={thought}
                             isGenerating={isPending}
                           />
                         </div>
-                      </details>
+                      </div>
                     )}
 
                     {msg.extra && msg.extra.length > 0 && (
-                      <details
-                        className={classNames({
-                          'collapse collapse-arrow mb-4 bg-base-200': true,
-                          'bg-opacity-10': msg.role !== 'assistant',
-                        })}
-                      >
-                        <summary className="collapse-title">
+                      <div className="chatbox-collapsible">
+                        <div className="chatbox-collapsible-header" onClick={(e) => {
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            parent.classList.toggle('chatbox-collapsible-open');
+                          }
+                        }}>
                           Extra content
-                        </summary>
-                        <div className="collapse-content">
+                        </div>
+                        <div className="chatbox-collapsible-content">
                           {msg.extra.map(
                             (extra, i) =>
                               extra.type === 'textFile' ? (
@@ -186,7 +172,7 @@ export default function ChatMessage({
                               ) : null // TODO: support other extra types
                           )}
                         </div>
-                      </details>
+                      </div>
                     )}
 
                     <MarkdownDisplay
@@ -198,15 +184,11 @@ export default function ChatMessage({
               )}
               {/* render timings if enabled */}
               {timings && config.showTokensPerSecond && (
-                <div className="dropdown dropdown-hover dropdown-top mt-2">
-                  <div
-                    tabIndex={0}
-                    role="button"
-                    className="cursor-pointer font-semibold text-sm opacity-60"
-                  >
+                <div className="chatbox-timings">
+                  <div className="chatbox-timings-summary">
                     Speed: {timings.predicted_per_second.toFixed(1)} t/s
                   </div>
-                  <div className="dropdown-content bg-base-100 z-10 w-64 p-2 shadow mt-4">
+                  <div className="chatbox-timings-details">
                     <b>Prompt</b>
                     <br />- Tokens: {timings.prompt_n}
                     <br />- Time: {timings.prompt_ms} ms
@@ -227,41 +209,30 @@ export default function ChatMessage({
 
       {/* actions for each message */}
       {msg.content !== null && (
-        <div
-          className={classNames({
-            'flex items-center gap-2 mx-4 mt-2 mb-2': true,
-            'flex-row-reverse': msg.role === 'user',
-          })}
-        >
+        <div className={`chatbox-actions ${msg.role === 'user' ? 'chatbox-actions-user' : 'chatbox-actions-assistant'}`}>
           {siblingLeafNodeIds && siblingLeafNodeIds.length > 1 && (
-            <div className="flex gap-1 items-center opacity-60 text-sm">
+            <div className="chatbox-siblings">
               <button
-                className={classNames({
-                  'btn btn-sm btn-ghost p-1': true,
-                  'opacity-20': !prevSibling,
-                })}
+                className={`chatbox-sibling-nav ${!prevSibling ? 'chatbox-sibling-nav-disabled' : ''}`}
                 onClick={() => prevSibling && onChangeSibling(prevSibling)}
               >
-                <ChevronLeftIcon className="h-4 w-4" />
+                <ChevronLeftIcon className="chatbox-icon-small" />
               </button>
               <span>
                 {siblingCurrIdx + 1} / {siblingLeafNodeIds.length}
               </span>
               <button
-                className={classNames({
-                  'btn btn-sm btn-ghost p-1': true,
-                  'opacity-20': !nextSibling,
-                })}
+                className={`chatbox-sibling-nav ${!nextSibling ? 'chatbox-sibling-nav-disabled' : ''}`}
                 onClick={() => nextSibling && onChangeSibling(nextSibling)}
               >
-                <ChevronRightIcon className="h-4 w-4" />
+                <ChevronRightIcon className="chatbox-icon-small" />
               </button>
             </div>
           )}
           {/* user message */}
           {msg.role === 'user' && (
             <button
-              className="badge btn-mini show-on-hover"
+              className="chatbox-button chatbox-button-hidden"
               onClick={() => setEditingContent(msg.content)}
               disabled={msg.content === null}
             >
@@ -273,7 +244,7 @@ export default function ChatMessage({
             <>
               {!isPending && (
                 <button
-                  className="badge btn-mini show-on-hover mr-2"
+                  className="chatbox-button chatbox-button-hidden"
                   onClick={() => {
                     if (msg.content !== null) {
                       onRegenerateMessage(msg as Message);
@@ -287,7 +258,7 @@ export default function ChatMessage({
             </>
           )}
           <CopyButton
-            className="badge btn-mini show-on-hover mr-2"
+            className="chatbox-button chatbox-button-hidden"
             content={msg.content}
           />
         </div>
